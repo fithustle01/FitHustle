@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FitHustle01 - AI Fitness Trainer</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --or:#FF8C00;
+  --re:#E50000;
+  --dk:#050505;
+  --cd:#111;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--dk);color:white;overflow-x:hidden;font-family:'Rajdhani',sans-serif;font-size:15px;}
+input[type="file"]{display:none!important;position:absolute!important;width:0!important;height:0!important;opacity:0!important;}
+a{text-decoration:none;}
+
+/* NAV */
+nav{width:100%;padding:12px 5%;background:#000;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:999;border-bottom:2px solid var(--re);}
+.logo{display:flex;align-items:center;gap:10px;}
+.lwrap{position:relative;width:48px;height:48px;cursor:pointer;flex-shrink:0;}
+.lwrap img{width:48px;height:48px;border-radius:50%;border:2px solid var(--or);object-fit:cover;transition:.3s;display:block;}
+.lwrap:hover img{filter:brightness(.3);}
+.leov{position:absolute;top:0;left:0;width:100%;height:100%;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;transition:.3s;pointer-events:none;}
+.lwrap:hover .leov{opacity:1;}
+.leov i{font-size:14px;color:var(--or);}
+.leov span{font-size:7px;color:var(--or);font-weight:700;}
+.logo h1{color:var(--or);font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;}
+.nmenu{display:flex;gap:18px;}
+.nmenu a{color:#ccc;font-weight:700;font-size:13px;transition:.3s;letter-spacing:1px;padding:5px 0;border-bottom:2px solid transparent;}
+.nmenu a:hover,.nmenu a.act{color:var(--or);border-bottom-color:var(--or);}
+.nsoc{display:flex;gap:9px;align-items:center;}
+.si{position:relative;}
+.si a{color:white;font-size:18px;transition:.3s;}
+.si a:hover{color:var(--or);}
+.sedit{position:absolute;top:-6px;right:-6px;background:var(--or);color:black;border:none;border-radius:50%;width:13px;height:13px;font-size:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:.3s;z-index:10;}
+.si:hover .sedit{opacity:1;}
+.hbg{display:none;flex-direction:column;gap:4px;cursor:pointer;padding:4px;}
+.hbg span{width:22px;height:2px;background:white;}
+.mmenu{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.97);z-index:9998;flex-direction:column;align-items:center;justify-content:center;gap:22px;}
+.mmenu.open{display:flex;}
+.mmenu a{color:white;font-size:26px;font-family:'Bebas Neue',sans-serif;letter-spacing:3px;transition:.3s;}
+.mmenu a:hover{color:var(--or);}
+.mclose{position:absolute;top:18px;right:22px;font-size:26px;cursor:pointer;color:white;}
+
+/* HERO */
+.hero{width:100%;min-height:100vh;display:flex;justify-content:space-between;align-items:center;padding:70px 7%;background:linear-gradient(rgba(0,0,0,.78),rgba(0,0,0,.88)),url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1600&auto=format&fit=crop');background-size:cover;background-position:center;}
+.htxt{width:52%;}
+.htxt h3{color:var(--or);font-size:16px;margin-bottom:10px;letter-spacing:4px;}
+.htxt h1{font-family:'Bebas Neue',sans-serif;font-size:68px;line-height:72px;margin-bottom:16px;}
+.htxt span{color:var(--re);}
+.htxt p{font-size:16px;line-height:27px;margin-bottom:26px;color:#ddd;max-width:480px;}
+.hbtns{display:flex;gap:12px;flex-wrap:wrap;}
+.btn{padding:11px 24px;border:none;border-radius:50px;cursor:pointer;font-size:14px;font-weight:700;transition:.4s;letter-spacing:1px;font-family:'Rajdhani',sans-serif;display:inline-flex;align-items:center;gap:7px;}
+.br{background:linear-gradient(to right,var(--re),var(--or));color:white;}
+.br:hover{transform:scale(1.06);}
+.bg{background:#25D366;color:white;}
+.bg:hover{transform:scale(1.06);}
+.bo{background:transparent;color:var(--or);border:2px solid var(--or);}
+.bo:hover{background:var(--or);color:black;transform:scale(1.06);}
+.hiside{width:44%;display:flex;justify-content:center;}
+.hiwrap{position:relative;width:100%;max-width:440px;cursor:pointer;}
+.hiwrap img{width:100%;border-radius:18px;animation:fl 3s infinite ease-in-out;transition:.3s;display:block;box-shadow:0 0 35px rgba(255,140,0,.2);}
+.hiwrap:hover img{filter:brightness(.3);animation-play-state:paused;}
+.ieov{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:7px;opacity:0;transition:.3s;pointer-events:none;text-align:center;}
+.hiwrap:hover .ieov,.aiwrap:hover .ieov,.wiwrap:hover .ieov{opacity:1;}
+.ieov i{font-size:28px;color:var(--or);}
+.ieov span{font-size:11px;color:var(--or);font-weight:700;}
+@keyframes fl{0%{transform:translateY(0);}50%{transform:translateY(-13px);}100%{transform:translateY(0);}}
+
+/* SECTION COMMON */
+.sec{padding:80px 7%;}
+.sec.dark{background:#080808;}
+.stitle{font-family:'Bebas Neue',sans-serif;font-size:44px;color:var(--or);letter-spacing:3px;margin-bottom:6px;text-align:center;}
+.ssub{text-align:center;color:#777;font-size:15px;margin-bottom:44px;}
+
+/* ABOUT */
+.agrid{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center;margin-bottom:44px;}
+.aiwrap{position:relative;border-radius:18px;overflow:hidden;cursor:pointer;}
+.aiwrap img{width:100%;border-radius:18px;display:block;transition:.3s;}
+.aiwrap:hover img{filter:brightness(.3);}
+.actxt h2{font-family:'Bebas Neue',sans-serif;font-size:36px;color:white;letter-spacing:2px;margin-bottom:14px;line-height:40px;}
+.actxt h2 span{color:var(--or);}
+.actxt p{color:#bbb;font-size:15px;line-height:26px;margin-bottom:14px;}
+.stats{display:flex;gap:24px;margin-top:22px;flex-wrap:wrap;}
+.sbox .n{font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--or);line-height:1;}
+.sbox .l{color:#777;font-size:12px;letter-spacing:1px;}
+.frow{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;}
+.fc{background:var(--cd);border:2px solid #1a1a1a;border-radius:14px;padding:22px;transition:.4s;}
+.fc:hover{border-color:var(--or);transform:translateY(-5px);}
+.fc i{font-size:32px;color:var(--or);margin-bottom:10px;}
+.fc h3{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;margin-bottom:6px;}
+.fc p{color:#888;font-size:13px;line-height:21px;}
+
+/* TABS */
+.tabs{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:34px;}
+.tbtn{padding:9px 20px;background:#1a1a1a;border:2px solid #2a2a2a;color:#aaa;border-radius:50px;cursor:pointer;font-size:13px;font-weight:700;transition:.3s;letter-spacing:1px;font-family:'Rajdhani',sans-serif;}
+.tbtn:hover,.tbtn.act{background:var(--or);border-color:var(--or);color:black;}
+.panel{display:none;}
+.panel.act{display:block;}
+.ptitle{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--or);letter-spacing:2px;margin-bottom:6px;}
+.pdesc{color:#777;font-size:14px;margin-bottom:22px;}
+
+/* VIDEO GRID */
+.vgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;}
+.vbox{background:var(--cd);border:2px solid #1a1a1a;border-radius:14px;overflow:hidden;transition:.3s;}
+.vbox:hover{border-color:var(--or);}
+.vbox iframe{width:100%;height:190px;border:none;display:block;}
+.vbox .vi{padding:12px;}
+.vbox .vi h4{color:white;font-size:14px;font-weight:700;margin-bottom:4px;}
+.vbox .vi p{color:#777;font-size:12px;}
+
+/* FAT COMPARE */
+.fcomp{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px;}
+.fbox{border-radius:14px;overflow:hidden;position:relative;}
+.fbox img{width:100%;height:200px;object-fit:cover;display:block;}
+.fbox .flbl{position:absolute;bottom:0;left:0;right:0;padding:10px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;text-align:center;}
+.fbox.bad .flbl{background:rgba(229,0,0,.8);}
+.fbox.good .flbl{background:rgba(46,204,113,.8);}
+
+/* WORKOUT PANELS */
+.wcont{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start;}
+.wiwrap{position:relative;cursor:pointer;}
+.wiwrap img{width:100%;border-radius:14px;display:block;transition:.3s;}
+.wiwrap:hover img{filter:brightness(.3);}
+.winfo h2{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--or);letter-spacing:2px;margin-bottom:10px;}
+.winfo p{color:#bbb;font-size:14px;line-height:24px;margin-bottom:14px;}
+.slist{list-style:none;margin-bottom:16px;}
+.slist li{padding:7px 0;border-bottom:1px solid #1a1a1a;color:#bbb;font-size:13px;display:flex;align-items:flex-start;gap:9px;}
+.slist li:last-child{border-bottom:none;}
+.slist li span{color:var(--or);font-weight:700;font-size:14px;min-width:20px;}
+.wvids h3{font-family:'Bebas Neue',sans-serif;font-size:20px;color:white;letter-spacing:1px;margin-bottom:13px;}
+
+/* DOWNLOAD */
+.dlsec{padding:80px 7%;background:linear-gradient(135deg,#0a0000,#000);}
+.dlwrap{max-width:620px;margin:0 auto;}
+.dlstep{display:none;}
+.dlstep.act{display:block;}
+.psteps{display:flex;align-items:center;justify-content:center;margin-bottom:28px;}
+.psc{width:32px;height:32px;border-radius:50%;background:#1a1a1a;border:2px solid #333;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#555;transition:.3s;}
+.psc.done{background:var(--or);border-color:var(--or);color:black;}
+.psc.act{border-color:var(--or);color:var(--or);}
+.psl{width:50px;height:2px;background:#222;}
+.psl.done{background:var(--or);}
+
+.pcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px;margin-top:22px;}
+.pcard{background:var(--cd);border:2px solid #222;border-radius:14px;padding:20px;transition:.4s;cursor:pointer;text-align:center;}
+.pcard:hover,.pcard.sel{border-color:var(--or);box-shadow:0 0 18px rgba(255,140,0,.2);}
+.pcard .pi{font-size:34px;margin-bottom:10px;}
+.pcard h3{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:white;margin-bottom:6px;}
+.pcard p{color:#888;font-size:12px;line-height:20px;}
+.ftag{display:inline-block;background:linear-gradient(to right,var(--or),var(--re));color:white;padding:2px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:8px;}
+
+.fbox2{background:var(--cd);border:2px solid var(--or);border-radius:18px;padding:34px;}
+.fbox2 h2{font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--or);letter-spacing:2px;margin-bottom:6px;}
+.fbox2 .pch{color:#777;font-size:13px;margin-bottom:22px;}
+.fbox2 .pch span{color:var(--or);font-weight:700;}
+.fld{margin-bottom:14px;}
+.fld label{display:block;color:#777;font-size:12px;letter-spacing:1px;margin-bottom:5px;}
+.fld input,.fld select{width:100%;padding:12px 17px;background:#1a1a1a;border:2px solid #2a2a2a;border-radius:50px;color:white;font-size:14px;outline:none;transition:.3s;font-family:'Rajdhani',sans-serif;appearance:none;-webkit-appearance:none;}
+.fld select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath fill='%23FF8C00' d='M1 1l4 4 4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;padding-right:36px;}
+.fld select option{background:#1a1a1a;}
+.fld input:focus,.fld select:focus{border-color:var(--or);}
+.fld input::placeholder{color:#444;}
+.sbtn{width:100%;padding:14px;background:linear-gradient(to right,var(--or),var(--re));color:white;border:none;border-radius:50px;font-size:17px;font-weight:700;cursor:pointer;transition:.3s;font-family:'Bebas Neue',sans-serif;letter-spacing:2px;}
+.sbtn:hover{transform:scale(1.03);box-shadow:0 0 22px rgba(255,140,0,.4);}
+.bbtn{background:none;border:none;color:#666;font-size:13px;cursor:pointer;margin-top:10px;display:block;text-align:center;font-family:'Rajdhani',sans-serif;width:100%;}
+.bbtn:hover{color:var(--or);}
+
+.sbox2{background:var(--cd);border:2px solid #2ecc71;border-radius:18px;padding:44px;text-align:center;}
+.sbox2 .ck{font-size:60px;margin-bottom:16px;}
+.sbox2 h2{font-family:'Bebas Neue',sans-serif;font-size:34px;color:#2ecc71;letter-spacing:2px;margin-bottom:8px;}
+.sbox2 p{color:#bbb;font-size:15px;line-height:24px;margin-bottom:22px;}
+.dbtn{padding:13px 32px;background:linear-gradient(to right,#2ecc71,#27ae60);color:white;border:none;border-radius:50px;font-size:16px;font-weight:700;cursor:pointer;transition:.3s;font-family:'Bebas Neue',sans-serif;letter-spacing:2px;}
+.dbtn:hover{transform:scale(1.05);}
+
+/* CONTACT */
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:44px;margin-top:34px;}
+.cinfo h2{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--or);letter-spacing:2px;margin-bottom:12px;}
+.cinfo p{color:#bbb;font-size:15px;line-height:26px;margin-bottom:24px;}
+.clinks{display:flex;flex-direction:column;gap:12px;}
+.clink{display:flex;align-items:center;gap:13px;padding:14px 18px;background:var(--cd);border:2px solid #1a1a1a;border-radius:11px;color:white;transition:.3s;}
+.clink:hover{border-color:var(--or);transform:translateX(5px);}
+.clico{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.clink.fb .clico{background:#1877F2;}
+.clink.ig .clico{background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);}
+.clink.yt .clico{background:#FF0000;}
+.clink.wa .clico{background:#25D366;}
+.clink.em .clico{background:var(--or);}
+.cltxt strong{display:block;font-size:14px;font-weight:700;}
+.cltxt span{color:#777;font-size:12px;}
+.ccard{background:var(--cd);border:2px solid #1a1a1a;border-radius:14px;padding:26px;display:flex;flex-direction:column;gap:14px;}
+.ccard h3{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--or);letter-spacing:2px;}
+.iit{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid #1a1a1a;}
+.iit:last-of-type{border-bottom:none;}
+.iit i{color:var(--or);font-size:14px;width:18px;}
+.iit span{color:#bbb;font-size:14px;}
+
+/* FOOTER */
+footer{background:#000;padding:44px 7%;border-top:2px solid #1a1a1a;}
+.fgrid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:34px;margin-bottom:30px;}
+.fbrand h2{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--or);letter-spacing:2px;margin-bottom:10px;}
+.fbrand p{color:#555;font-size:13px;line-height:22px;}
+.fcol h3{font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--or);letter-spacing:1px;margin-bottom:13px;}
+.fcol a{display:block;color:#555;font-size:13px;line-height:28px;transition:.3s;}
+.fcol a:hover{color:var(--or);}
+.copy{text-align:center;color:#2a2a2a;font-size:12px;padding-top:20px;border-top:1px solid #1a1a1a;}
+
+/* MODAL */
+.mov{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.92);z-index:9999;justify-content:center;align-items:center;}
+.mov.act{display:flex;}
+.mbox{background:#111;border:2px solid var(--or);border-radius:18px;padding:34px;width:90%;max-width:400px;text-align:center;}
+.mbox h2{font-family:'Bebas Neue',sans-serif;color:var(--or);font-size:22px;letter-spacing:2px;margin-bottom:16px;}
+.mbox input{width:100%;padding:12px 17px;background:#1a1a1a;border:2px solid #333;border-radius:50px;color:white;font-size:14px;margin-bottom:16px;outline:none;transition:.3s;font-family:'Rajdhani',sans-serif;}
+.mbox input:focus{border-color:var(--or);}
+.mbtns{display:flex;gap:10px;justify-content:center;}
+.ms{padding:10px 26px;background:linear-gradient(to right,var(--or),var(--re));color:white;border:none;border-radius:50px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;}
+.mc{padding:10px 26px;background:#222;color:white;border:none;border-radius:50px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;}
+.mc:hover{background:#444;}
+
+#toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--or);color:black;padding:10px 24px;border-radius:50px;font-weight:700;font-size:13px;z-index:99999;transition:transform .4s;pointer-events:none;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+
+@media(max-width:1000px){
+  .hero{flex-direction:column;text-align:center;padding:60px 5%;}
+  .htxt{width:100%;}
+  .hiside{width:100%;margin-top:30px;}
+  .htxt h1{font-size:50px;line-height:55px;}
+  .agrid,.wcont,.cgrid,.fgrid{grid-template-columns:1fr;}
+  .fcomp{grid-template-columns:1fr;}
+  .nmenu{display:none;}
+  .hbg{display:flex;}
+}
+@media(max-width:600px){
+  .htxt h1{font-size:38px;line-height:44px;}
+  .stitle{font-size:34px;}
+  .fgrid{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- File Inputs -->
+<input type="file" id="logoInp" accept="image/*">
+<input type="file" id="heroInp" accept="image/*">
+<input type="file" id="aboutInp" accept="image/*">
+<input type="file" id="wi1" accept="image/*"><input type="file" id="wi2" accept="image/*">
+<input type="file" id="wi3" accept="image/*"><input type="file" id="wi4" accept="image/*">
+<input type="file" id="wi5" accept="image/*"><input type="file" id="wi6" accept="image/*">
+
+<div id="toast">Saved!</div>
+
+<!-- Modal -->
+<div class="mov" id="socMov">
+  <div class="mbox">
+    <h2 id="movTitle">Edit Link</h2>
+    <input type="text" id="movInp" placeholder="Paste your link here...">
+    <div class="mbtns">
+      <button class="ms" onclick="saveLink()">SAVE</button>
+      <button class="mc" onclick="closeMov()">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<!-- Mobile Menu -->
+<div class="mmenu" id="mmenu">
+  <span class="mclose" onclick="closeMM()"><i class="fas fa-times"></i></span>
+  <a href="#about" onclick="closeMM()">About</a>
+  <a href="#videos" onclick="closeMM()">Videos</a>
+  <a href="#workouts" onclick="closeMM()">Workouts</a>
+  <a href="#download" onclick="closeMM()">Free Plan</a>
+  <a href="#contact" onclick="closeMM()">Contact</a>
+</div>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="logo">
+    <div class="lwrap" onclick="document.getElementById('logoInp').click()">
+      <img src="https://i.imgur.com/2DhmtJ4.png" id="nLogo" alt="Logo">
+      <div class="leov"><i class="fas fa-pencil-alt"></i><span>EDIT</span></div>
+    </div>
+    <h1>FitHustle01</h1>
+  </div>
+  <div class="nmenu">
+    <a href="#about">About</a>
+    <a href="#videos">Videos</a>
+    <a href="#workouts">Workouts</a>
+    <a href="#download">Free Plan</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <div class="nsoc">
+    <div class="si"><a id="fbL" href="https://facebook.com/fithustle01" target="_blank"><i class="fab fa-facebook"></i></a><button class="sedit" onclick="openMov('fb','Facebook')"><i class="fas fa-pencil-alt"></i></button></div>
+    <div class="si"><a id="igL" href="https://instagram.com/fithustle01" target="_blank"><i class="fab fa-instagram"></i></a><button class="sedit" onclick="openMov('ig','Instagram')"><i class="fas fa-pencil-alt"></i></button></div>
+    <div class="si"><a id="ytL" href="https://youtube.com/@FitHustle01" target="_blank"><i class="fab fa-youtube"></i></a><button class="sedit" onclick="openMov('yt','YouTube')"><i class="fas fa-pencil-alt"></i></button></div>
+    <div class="si"><a id="waL" href="https://wa.me/923213011948" target="_blank"><i class="fab fa-whatsapp"></i></a><button class="sedit" onclick="openMov('wa','WhatsApp')"><i class="fas fa-pencil-alt"></i></button></div>
+    <div class="hbg" onclick="openMM()"><span></span><span></span><span></span></div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="htxt">
+    <h3>YOUR AI FITNESS TRAINER</h3>
+    <h1>TRAIN LIKE A <span>SUPERHERO</span></h1>
+    <p>Build muscle, burn fat, and become powerful with AI-powered fitness workouts. Join thousands transforming their bodies with FitHustle01.</p>
+    <div class="hbtns">
+      <a href="#download" class="btn br"><i class="fas fa-download"></i> FREE PLAN</a>
+      <a href="#workouts" class="btn bo"><i class="fas fa-dumbbell"></i> WORKOUTS</a>
+      <a href="https://wa.me/923213011948" class="btn bg"><i class="fab fa-whatsapp"></i> WHATSAPP</a>
+    </div>
+  </div>
+  <div class="hiside">
+    <div class="hiwrap" onclick="document.getElementById('heroInp').click()">
+      <img id="heroImg" src="https://images.unsplash.com/photo-1605296867304-46d5465a13f1?w=500&auto=format&fit=crop" alt="Hero">
+      <div class="ieov"><i class="fas fa-pencil-alt"></i><span>Change Image</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="sec dark" id="about">
+  <h1 class="stitle">ABOUT FITHUSTLE01</h1>
+  <p class="ssub">Everything you need to know about your AI fitness journey</p>
+  <div class="agrid">
+    <div class="aiwrap" onclick="document.getElementById('aboutInp').click()">
+      <img id="aboutImg" src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&auto=format&fit=crop" alt="About">
+      <div class="ieov"><i class="fas fa-pencil-alt"></i><span>Change Image</span></div>
+    </div>
+    <div class="actxt">
+      <h2>WE HELP YOU BUILD YOUR <span>DREAM BODY</span></h2>
+      <p>FitHustle01 is Pakistan's #1 AI-powered fitness platform. Whether you are a beginner or advanced athlete, we have the right workout plan, techniques and guidance for you — completely free.</p>
+      <p>Our YouTube channel, website and community are designed to give you maximum value. Fitness should be accessible to everyone, everywhere, without spending a single rupee.</p>
+      <div class="stats">
+        <div class="sbox"><div class="n">50K+</div><div class="l">SUBSCRIBERS</div></div>
+        <div class="sbox"><div class="n">200+</div><div class="l">FREE VIDEOS</div></div>
+        <div class="sbox"><div class="n">10K+</div><div class="l">TRANSFORMATIONS</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="frow">
+    <div class="fc"><i class="fas fa-brain"></i><h3>AI Guidance</h3><p>Smart workout recommendations based on your body type and goals.</p></div>
+    <div class="fc"><i class="fas fa-video"></i><h3>200+ Free Videos</h3><p>Step-by-step tutorials for every muscle group — chest, arms, legs, abs.</p></div>
+    <div class="fc"><i class="fas fa-download"></i><h3>Free Plans</h3><p>Download complete 4-week programs for beginners, intermediate and advanced.</p></div>
+    <div class="fc"><i class="fas fa-users"></i><h3>Community</h3><p>Join our WhatsApp group — ask questions, share progress, stay motivated!</p></div>
+  </div>
+</section>
+
+<!-- VIDEOS -->
+<section class="sec" id="videos">
+  <h1 class="stitle">FITNESS VIDEOS</h1>
+  <p class="ssub">Select a category and watch the best fitness videos</p>
+  <div class="tabs">
+    <button class="tbtn act" onclick="sw('v','fat',this)">🔥 Fat Loss</button>
+    <button class="tbtn" onclick="sw('v','arms',this)">💪 Arms</button>
+    <button class="tbtn" onclick="sw('v','abs',this)">🎯 Abs</button>
+    <button class="tbtn" onclick="sw('v','chest',this)">🏋️ Chest</button>
+    <button class="tbtn" onclick="sw('v','legs',this)">🦵 Legs</button>
+    <button class="tbtn" onclick="sw('v','full',this)">⚡ Full Body</button>
+  </div>
+
+  <!-- FAT LOSS -->
+  <div class="panel act" id="v-fat">
+    <div class="ptitle">🔥 FAT LOSS VIDEOS</div>
+    <div class="pdesc">Burn fat fast — cardio, HIIT and fat loss transformation guide.</div>
+    <div class="fcomp">
+      <div class="fbox bad"><img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&auto=format&fit=crop" alt="Before"><div class="flbl">❌ BEFORE — OVERWEIGHT</div></div>
+      <div class="fbox good"><img src="https://images.unsplash.com/photo-1605296867304-46d5465a13f1?w=400&auto=format&fit=crop" alt="After"><div class="flbl">✅ AFTER — PERFECT BODY</div></div>
+    </div>
+    <div class="vgrid">
+      <div class="vbox"><iframe src="https://www.youtube.com/embed/tUykoP30Gb0" allowfullscreen></iframe><div class="vi"><h4>30-Min Fat Burn HIIT</h4><p>Full body cardio — no equipment</p></div></div>
+      <div class="vbox"><iframe src="https://www.youtube.com/embed/UIPvIYsjfpo" allowfullscreen></iframe><div class="vi"><h4>Cardio Fat Burn Routine</h4><p>Burn max calories fast</p></div></div>
+      <div class="vbox"><iframe src="https://www.youtube.com/embed/2MoGxae-zyo" allowfullscreen></iframe><div class="vi"><h4>Home HIIT Workout</h4><p>20 minutes — high intensity</p></div></div>
+      <div class="vbox"><iframe src="https://www.youtube.com/embed/tUykoP30Gb0" allowfullscreen></iframe><div class="vi"><h4>Fat Loss Diet Tips</h4><p>Eat right to lose fat fast</p></div></div>
+      <div class="vbox"><iframe src="https://www.youtube.com/embed/UIPvIYsjfpo" allowfullscreen></iframe><div class="vi"><h4>Morning Cardio Routine</h4><p>Start day with fat burn</p></div></div>
+    </div>
+  </div>
+
+  <!-- ARMS -->
+  <div class="panel" id="v-arms">
+    <div class="ptitle">💪 ARMS VIDEOS</div>
+    <div class="pdesc">Build strong muscular arms — biceps, triceps and forearms complete guide.</div>
+    <div class="vgrid">
+      <div class="vbox"><iframe src="https://www.youtube.com/embed/2MoGxae-zyo" allowfullscreen></iframe><div class="vi"><h4>Bicep Curl Technique</h4><p>Build massive biceps step by step</p></div></div>
+      <div class="vbox"><iframe src="https://www.youtube.com/embed/tUykoP30Gb0" allowfullscreen></iframe><div class="vi"><h4>Tricep Dip Workout</h4><p>Powerful triceps at home</p></div></div>
+      <div class="vbox"><iframe src="https://www.youtube.com/embed/UIPvIYsjfpo" allowfullscreen></iframe><div class="vi"><h4>Dumbbell Arms Workout</h4><p>Full arms session with dumbbells</p></div></div>
+      <div class="vbox"><iframe src="https://www.youtube.com/embed/2MoGxae-zyo" allowfullscreen></iframe><div class="vi"><h4>Forearm Strength</h4><p>Grip and forearm exercises</p></div></div>
+      <div class="vbox"><iframe src="https://www.youtube.com/embed/tUykoP30Gb0" allowfullscreen></iframe><div class="vi"><h4>Arms Size & Definition</h4><p>Get bigger arms in 4 weeks</p></div></div>
+    </div>
+  </div>
+
+  <!-- ABS -->
+  <div class="panel" id="v-abs">
+    <div class="ptitle">🎯 ABS VIDEOS</div>
+    <div class="pdesc">Six pack abs — core strength, leg raises and crunch variations.</div>
+    <div class="vgrid">
+      <div class="vbox"><iframe src="https://www.youtube.com/embed/UIPvIYsjfpo" allowfullscreen></iframe><div class="vi"><h4>Six Pack Abs Routine</h4><p>Daily 10-minute abs workout</p></div></div>
+      <div class="vbox"><iframe src="https://www.youtube.com/embed/2MoGxae-zyo" allowfullscreen></iframe><div class="vi"><h4>Core Strength Training</h4><p>Planks, crunches and leg raises</p></div></div>
+      <div class="vbox"><iframe src="https://www.youtube.com/embed/tUykoP30Gb0" allowfullscreen></iframe><div class="vi"><h4>Lower Abs Workout</h4><p>Leg raises and reverse crunches</p></div></div>
+      <div class="vbox"><iframe src="https://www.youtube.com/embed/UIPvIYsjfpo" allowfullscreen></iframe><div class="vi"><h4>Oblique & Side Abs</h4><p>Complete core definition</p></div></div>
+      <div class="vbox"><iframe src="https://www.youtube.com/embed/2MoGxae-zyo" allowfullscreen></iframe><div class="vi"><h4>Beginner Abs Program</h4><p>Start your six pack journey</p></div></div>
+    </div>
+  </div>
+
+  <!-- CHEST -->
+  <div class="panel" id="v-chest">
+    <div class="ptitle">🏋️ CHEST VIDEOS</div>
+    <div class="pdesc">Build a powerful chest — push-ups, bench press and chest fly tutorials.</div>
+    <div class="vgrid">
+      <div class="vbox"><iframe src="https://www.youtube.com/embed/tUykoP30Gb0" allowfullscreen></iframe><div class="vi"><h4>Chest Workout Routine</h4><p>Build massive chest at home or gym</p></div></div>
+      <div class="vbox"><iframe src="https://www.youtube.com/embed/UIPvIYsjfpo" allowfullscreen></iframe><div class="vi"><h4>Push-Up Variations</h4><p>10 types for chest growth</p></div></div>
+      <div class="vbox"><iframe src="https://www.youtube.com/embed/2MoGxae-zyo" allowfullscreen></iframe><div class="vi"><h4>Bench Press Technique</h4><p>Perfect form for chest gains</p></div></div>
+      <div class="vbox"><iframe src="https://www.youtube.com/embed/tUykoP30Gb0" allowfullscreen></iframe><div class="vi"><h4>Upper Chest Focus</h4><p>Incline variations for upper chest</p></div></div>
+      <div class="vbox"><iframe src="https://www.youtube.com/embed/UIPvIYsjfpo" allowfullscreen></iframe><div class="vi"><h4>Chest & Triceps Day</h4><p>Combined push day workout</p></div></div>
+    </div>
+  </div>
+
+  <!-- LEGS -->
+  <div class="panel" id="v-legs">
+    <div class="ptitle">🦵 LEGS VIDEOS</div>
+    <div class="pdesc">Strong legs = strong body. Squats, lunges, leg press and more.</div>
+    <div class="vgrid">
+      <div class="vbox"><iframe src="https://www.youtube.com/embed/2MoGxae-zyo" allowfullscreen></iframe><div class="vi"><h4>Complete Leg Day</h4><p>Full lower body training guide</p></div></div>
+      <div class="vbox"><iframe src="https://www.youtube.com/embed/tUykoP30Gb0" allowfullscreen></iframe><div class="vi"><h4>Squat Masterclass</h4><p>Perfect squat form and variations</p></div></div>
+      <div class="vbox"><iframe src="https://www.youtube.com/embed/UIPvIYsjfpo" allowfullscreen></iframe><div class="vi"><h4>Lunge Variations</h4><p>Build leg size with lunges</p></div></div>
+      <div class="vbox"><iframe src="https://www.youtube.com/embed/2MoGxae-zyo" allowfullscreen></iframe><div class="vi"><h4>Calf & Hamstring</h4><p>Complete lower leg training</p></div></div>
+      <div class="vbox"><iframe src="https://www.youtube.com/embed/tUykoP30Gb0" allowfullscreen></iframe><div class="vi"><h4>Leg Day No Equipment</h4><p>Powerful legs without gym</p></div></div>
+    </div>
+  </div>
+
+  <!-- FULL BODY -->
+  <div class="panel" id="v-full">
+    <div class="ptitle">⚡ FULL BODY VIDEOS</div>
+    <div class="pdesc">Train every muscle in one session — maximum results minimum time.</div>
+    <div class="vgrid">
+      <div class="vbox"><iframe src="https://www.youtube.com/embed/UIPvIYsjfpo" allowfullscreen></iframe><div class="vi"><h4>Full Body Workout</h4><p>All muscle groups in 45 minutes</p></div></div>
+      <div class="vbox"><iframe src="https://www.youtube.com/embed/2MoGxae-zyo" allowfullscreen></iframe><div class="vi"><h4>Beginner Full Body</h4><p>Perfect starting point day one</p></div></div>
+      <div class="vbox"><iframe src="https://www.youtube.com/embed/tUykoP30Gb0" allowfullscreen></iframe><div class="vi"><h4>Advanced Full Body</h4><p>Intense session for pros</p></div></div>
+      <div class="vbox"><iframe src="https://www.youtube.com/embed/UIPvIYsjfpo" allowfullscreen></iframe><div class="vi"><h4>Home Full Body Circuit</h4><p>No equipment needed</p></div></div>
+      <div class="vbox"><iframe src="https://www.youtube.com/embed/2MoGxae-zyo" allowfullscreen></iframe><div class="vi"><h4>30 Day Full Body Plan</h4><p>Monthly transformation workout</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- WORKOUTS -->
+<section class="sec dark" id="workouts">
+  <h1 class="stitle">WORKOUT GUIDE</h1>
+  <p class="ssub">Click on any workout to see full technique, steps and videos</p>
+  <div class="tabs">
+    <button class="tbtn act" onclick="sw('w','pu',this)">Push-Ups</button>
+    <button class="tbtn" onclick="sw('w','plu',this)">Pull-Ups</button>
+    <button class="tbtn" onclick="sw('w','sq',this)">Squats</button>
+    <button class="tbtn" onclick="sw('w','lr',this)">Leg Raises</button>
+    <button class="tbtn" onclick="sw('w','db',this)">Dumbbell</button>
+    <button class="tbtn" onclick="sw('w','pl',this)">Plank</button>
+  </div>
+
+  <!-- PUSH UPS -->
+  <div class="panel act" id="w-pu">
+    <div class="wcont">
+      <div class="wiwrap" onclick="document.getElementById('wi1').click()">
+        <img id="wi1Img" src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=500&auto=format&fit=crop" alt="Push Ups">
+        <div class="ieov"><i class="fas fa-pencil-alt"></i><span>Change Image</span></div>
+      </div>
+      <div class="winfo">
+        <h2>💪 PUSH-UP TECHNIQUE</h2>
+        <p>The push-up is king of upper body exercises. It builds chest, triceps and shoulders simultaneously. Master the form first, then increase reps.</p>
+        <ul class="slist">
+          <li><span>1.</span>Place hands slightly wider than shoulder-width</li>
+          <li><span>2.</span>Keep body in a straight line — head to heels</li>
+          <li><span>3.</span>Lower chest all the way to ground slowly</li>
+          <li><span>4.</span>Push back up fully — do not lock elbows</li>
+          <li><span>5.</span>Breathe in going down, breathe out going up</li>
+          <li><span>6.</span>Start: 3 sets of 10 reps, rest 60 seconds</li>
+        </ul>
+        <div class="wvids">
+          <h3>PUSH-UP VIDEOS</h3>
+          <div class="vgrid">
+            <div class="vbox"><iframe src="https://www.youtube.com/embed/tUykoP30Gb0" allowfullscreen></iframe><div class="vi"><h4>Push-Up Tutorial</h4><p>Perfect form guide</p></div></div>
+            <div class="vbox"><iframe src="https://www.youtube.com/embed/UIPvIYsjfpo" allowfullscreen></iframe><div class="vi"><h4>Push-Up Variations</h4><p>10 types for chest growth</p></div></div>
+            <div class="vbox"><iframe src="https://www.youtube.com/embed/2MoGxae-zyo" allowfullscreen></iframe><div class="vi"><h4>100 Push-Ups Program</h4><p>Build to 100 in 4 weeks</p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PULL UPS -->
+  <div class="panel" id="w-plu">
+    <div class="wcont">
+      <div class="wiwrap" onclick="document.getElementById('wi2').click()">
+        <img id="wi2Img" src="https://images.unsplash.com/photo-1598971639058-fab3c3109a69?w=500&auto=format&fit=crop" alt="Pull Ups">
+        <div class="ieov"><i class="fas fa-pencil-alt"></i><span>Change Image</span></div>
+      </div>
+      <div class="winfo">
+        <h2>🏋️ PULL-UP TECHNIQUE</h2>
+        <p>Pull-ups build back, biceps and grip strength. One of the most effective bodyweight exercises for building a V-shaped physique.</p>
+        <ul class="slist">
+          <li><span>1.</span>Grip the bar shoulder-width — overhand grip</li>
+          <li><span>2.</span>Hang fully — let shoulders stretch completely</li>
+          <li><span>3.</span>Pull chest toward bar — chin above it</li>
+          <li><span>4.</span>Squeeze back muscles hard at the top</li>
+          <li><span>5.</span>Lower slowly in 2-3 seconds — full control</li>
+          <li><span>6.</span>Start: 3 sets of 5-8 reps</li>
+        </ul>
+        <div class="wvids">
+          <h3>PULL-UP VIDEOS</h3>
+          <div class="vgrid">
+            <div class="vbox"><iframe src="https://www.youtube.com/embed/UIPvIYsjfpo" allowfullscreen></iframe><div class="vi"><h4>Pull-Up Tutorial</h4><p>Perfect technique guide</p></div></div>
+            <div class="vbox"><iframe src="https://www.youtube.com/embed/tUykoP30Gb0" allowfullscreen></iframe><div class="vi"><h4>Pull-Up for Beginners</h4><p>How to do your first pull-up</p></div></div>
+            <div class="vbox"><iframe src="https://www.youtube.com/embed/2MoGxae-zyo" allowfullscreen></iframe><div class="vi"><h4>Pull-Up Variations</h4><p>Wide, narrow and muscle-up</p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SQUATS -->
+  <div class="panel" id="w-sq">
+    <div class="wcont">
+      <div class="wiwrap" onclick="document.getElementById('wi3').click()">
+        <img id="wi3Img" src="https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=500&auto=format&fit=crop" alt="Squats">
+        <div class="ieov"><i class="fas fa-pencil-alt"></i><span>Change Image</span></div>
+      </div>
+      <div class="winfo">
+        <h2>🦵 SQUAT TECHNIQUE</h2>
+        <p>Squats are the king of all exercises. They work legs, glutes and core. Proper form prevents knee injuries and maximizes results.</p>
+        <ul class="slist">
+          <li><span>1.</span>Stand feet shoulder-width — toes slightly outward</li>
+          <li><span>2.</span>Keep chest up and back straight throughout</li>
+          <li><span>3.</span>Push knees in direction of your toes</li>
+          <li><span>4.</span>Lower until thighs are parallel to floor</li>
+          <li><span>5.</span>Drive through heels to stand back up</li>
+          <li><span>6.</span>Start: 3 sets of 12-15 reps</li>
+        </ul>
+        <div class="wvids">
+          <h3>SQUAT VIDEOS</h3>
+          <div class="vgrid">
+            <div class="vbox"><iframe src="https://www.youtube.com/embed/2MoGxae-zyo" allowfullscreen></iframe><div class="vi"><h4>Squat Tutorial</h4><p>Perfect squat form</p></div></div>
+            <div class="vbox"><iframe src="https://www.youtube.com/embed/tUykoP30Gb0" allowfullscreen></iframe><div class="vi"><h4>Squat Variations</h4><p>Jump, sumo, goblet squat</p></div></div>
+            <div class="vbox"><iframe src="https://www.youtube.com/embed/UIPvIYsjfpo" allowfullscreen></iframe><div class="vi"><h4>Barbell Squat Guide</h4><p>Heavy lifting technique</p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEG RAISES -->
+  <div class="panel" id="w-lr">
+    <div class="wcont">
+      <div class="wiwrap" onclick="document.getElementById('wi4').click()">
+        <img id="wi4Img" src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=500&auto=format&fit=crop" alt="Leg Raises">
+        <div class="ieov"><i class="fas fa-pencil-alt"></i><span>Change Image</span></div>
+      </div>
+      <div class="winfo">
+        <h2>🔥 LEG RAISES TECHNIQUE</h2>
+        <p>Best exercise for lower abs. Strengthens hip flexors and improves core stability. No equipment needed — do it anywhere!</p>
+        <ul class="slist">
+          <li><span>1.</span>Lie flat — hands under your glutes for support</li>
+          <li><span>2.</span>Keep legs straight — slight knee bend is okay</li>
+          <li><span>3.</span>Slowly raise legs up to 90 degrees</li>
+          <li><span>4.</span>Keep lower back pressed to the floor always</li>
+          <li><span>5.</span>Lower legs slowly — do NOT touch the floor</li>
+          <li><span>6.</span>Start: 3 sets of 12 reps</li>
+        </ul>
+        <div class="wvids">
+          <h3>LEG RAISES VIDEOS</h3>
+          <div class="vgrid">
+            <div class="vbox"><iframe src="https://www.youtube.com/embed/tUykoP30Gb0" allowfullscreen></iframe><div class="vi"><h4>Leg Raises Tutorial</h4><p>Perfect lower abs form</p></div></div>
+            <div class="vbox"><iframe src="https://www.youtube.com/embed/2MoGxae-zyo" allowfullscreen></iframe><div class="vi"><h4>Hanging Leg Raises</h4><p>Advanced variation on bar</p></div></div>
+            <div class="vbox"><iframe src="https://www.youtube.com/embed/UIPvIYsjfpo" allowfullscreen></iframe><div class="vi"><h4>Leg Raise Variations</h4><p>Floor, hanging and side raises</p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DUMBBELL -->
+  <div class="panel" id="w-db">
+    <div class="wcont">
+      <div class="wiwrap" onclick="document.getElementById('wi5').click()">
+        <img id="wi5Img" src="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=500&auto=format&fit=crop" alt="Dumbbell">
+        <div class="ieov"><i class="fas fa-pencil-alt"></i><span>Change Image</span></div>
+      </div>
+      <div class="winfo">
+        <h2>🏋️ DUMBBELL WORKOUT</h2>
+        <p>Dumbbells let you train every single muscle group. Bicep curls to shoulder press — dumbbells are your best fitness investment.</p>
+        <ul class="slist">
+          <li><span>1.</span>Choose weight you can do 10-12 reps with good form</li>
+          <li><span>2.</span>Keep core tight during every exercise</li>
+          <li><span>3.</span>Control movement — slow on the way down</li>
+          <li><span>4.</span>Full range of motion — squeeze muscle at peak</li>
+          <li><span>5.</span>Rest 45-60 seconds between sets</li>
+          <li><span>6.</span>Progress by adding weight every 2 weeks</li>
+        </ul>
+        <div class="wvids">
+          <h3>DUMBBELL VIDEOS</h3>
+          <div class="vgrid">
+            <div class="vbox"><iframe src="https://www.youtube.com/embed/UIPvIYsjfpo" allowfullscreen></iframe><div class="vi"><h4>Dumbbell Full Workout</h4><p>Complete session guide</p></div></div>
+            <div class="vbox"><iframe src="https://www.youtube.com/embed/tUykoP30Gb0" allowfullscreen></iframe><div class="vi"><h4>Dumbbell Chest Press</h4><p>Build chest with dumbbells</p></div></div>
+            <div class="vbox"><iframe src="https://www.youtube.com/embed/2MoGxae-zyo" allowfullscreen></iframe><div class="vi"><h4>Dumbbell Shoulder Press</h4><p>Build strong shoulders</p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLANK -->
+  <div class="panel" id="w-pl">
+    <div class="wcont">
+      <div class="wiwrap" onclick="document.getElementById('wi6').click()">
+        <img id="wi6Img" src="https://images.unsplash.com/photo-1566241142559-40e1dab266c6?w=500&auto=format&fit=crop" alt="Plank">
+        <div class="ieov"><i class="fas fa-pencil-alt"></i><span>Change Image</span></div>
+      </div>
+      <div class="winfo">
+        <h2>🧱 PLANK TECHNIQUE</h2>
+        <p>The ultimate core exercise. Strengthens abs, back, shoulders and glutes all at once. Just 60 seconds daily makes a huge difference!</p>
+        <ul class="slist">
+          <li><span>1.</span>Start on forearms and toes — elbows under shoulders</li>
+          <li><span>2.</span>Body in one straight line — head to heels</li>
+          <li><span>3.</span>Do NOT let hips sag or raise up</li>
+          <li><span>4.</span>Squeeze core and glutes tight throughout</li>
+          <li><span>5.</span>Breathe normally — focus on holding the form</li>
+          <li><span>6.</span>Start: 30 seconds — add 5 seconds daily</li>
+        </ul>
+        <div class="wvids">
+          <h3>PLANK VIDEOS</h3>
+          <div class="vgrid">
+            <div class="vbox"><iframe src="https://www.youtube.com/embed/2MoGxae-zyo" allowfullscreen></iframe><div class="vi"><h4>Plank Tutorial</h4><p>Perfect plank form</p></div></div>
+            <div class="vbox"><iframe src="https://www.youtube.com/embed/tUykoP30Gb0" allowfullscreen></iframe><div class="vi"><h4>Plank Variations</h4><p>Side plank and moving plank</p></div></div>
+            <div class="vbox"><iframe src="https://www.youtube.com/embed/UIPvIYsjfpo" allowfullscreen></iframe><div class="vi"><h4>5-Minute Plank Challenge</h4><p>Build to 5 minutes plank</p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FREE DOWNLOAD -->
+<section class="dlsec" id="download">
+  <h1 class="stitle">FREE WORKOUT PLANS</h1>
+  <p class="ssub">Download your personalized plan — 100% free, no credit card needed</p>
+  <div class="dlwrap">
+    <div class="psteps">
+      <div class="psc act" id="ps1">1</div>
+      <div class="psl" id="pl1"></div>
+      <div class="psc" id="ps2">2</div>
+      <div class="psl" id="pl2"></div>
+      <div class="psc" id="ps3">3</div>
+    </div>
+
+    <!-- Step 1 -->
+    <div class="dlstep act" id="ds1">
+      <h2 style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--or);letter-spacing:2px;text-align:center;margin-bottom:6px;">CHOOSE YOUR PLAN</h2>
+      <p style="text-align:center;color:#666;margin-bottom:20px;font-size:14px;">Select the plan that matches your fitness level</p>
+      <div class="pcards">
+        <div class="pcard" onclick="selPlan(this,'Beginner Muscle Building Plan')">
+          <div class="pi">🏃</div><span class="ftag">FREE</span>
+          <h3>Beginner Plan</h3>
+          <p>4-week starter. No equipment. Perfect for day one.</p>
+        </div>
+        <div class="pcard" onclick="selPlan(this,'Fat Loss & Cardio Plan')">
+          <div class="pi">🔥</div><span class="ftag">FREE</span>
+          <h3>Fat Loss Plan</h3>
+          <p>Burn fat fast with HIIT cardio and diet tips.</p>
+        </div>
+        <div class="pcard" onclick="selPlan(this,'Advanced Strength Plan')">
+          <div class="pi">🏆</div><span class="ftag">FREE</span>
+          <h3>Advanced Plan</h3>
+          <p>Heavy lifting and progressive overload for pros.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="dlstep" id="ds2">
+      <div class="fbox2">
+        <h2>YOUR DETAILS</h2>
+        <p class="pch">Plan: <span id="cpName">—</span></p>
+        <div class="fld"><label>YOUR NAME</label><input type="text" id="dlName" placeholder="Enter your name..."></div>
+        <div class="fld"><label>BIRTH YEAR</label><select id="dlYear"><option value="">Select birth year...</option></select></div>
+        <div class="fld"><label>COUNTRY</label>
+          <select id="dlCountry">
+            <option value="">Select your country...</option>
+            <option>Afghanistan</option><option>Albania</option><option>Algeria</option><option>Argentina</option><option>Australia</option><option>Austria</option><option>Azerbaijan</option><option>Bahrain</option><option>Bangladesh</option><option>Belgium</option><option>Brazil</option><option>Canada</option><option>China</option><option>Egypt</option><option>France</option><option>Germany</option><option>Ghana</option><option>India</option><option>Indonesia</option><option>Iran</option><option>Iraq</option><option>Italy</option><option>Japan</option><option>Jordan</option><option>Kenya</option><option>Kuwait</option><option>Lebanon</option><option>Libya</option><option>Malaysia</option><option>Morocco</option><option>Netherlands</option><option>New Zealand</option><option>Nigeria</option><option>Norway</option><option>Oman</option><option>Pakistan</option><option>Palestine</option><option>Philippines</option><option>Poland</option><option>Portugal</option><option>Qatar</option><option>Russia</option><option>Saudi Arabia</option><option>Somalia</option><option>South Africa</option><option>South Korea</option><option>Spain</option><option>Sri Lanka</option><option>Sudan</option><option>Sweden</option><option>Switzerland</option><option>Syria</option><option>Thailand</option><option>Tunisia</option><option>Turkey</option><option>UAE</option><option>UK</option><option>USA</option><option>Ukraine</option><option>Yemen</option>
+          </select>
+        </div>
+        <button class="sbtn" onclick="subDl()"><i class="fas fa-download"></i> DOWNLOAD MY FREE PLAN</button>
+        <button class="bbtn" onclick="goStep(1)">← Go back</button>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="dlstep" id="ds3">
+      <div class="sbox2">
+        <div class="ck">🎉</div>
+        <h2>CONGRATULATIONS!</h2>
+        <p id="suTxt">Your plan is ready! Click below to download.</p>
+        <button class="dbtn" onclick="doDownload()"><i class="fas fa-download"></i> DOWNLOAD NOW</button>
+        <br><br>
+        <button class="bbtn" onclick="goStep(1)">← Download another plan</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="sec dark" id="contact">
+  <h1 class="stitle">CONTACT US</h1>
+  <p class="ssub">Reach out on any platform — we reply fast!</p>
+  <div class="cgrid">
+    <div class="cinfo">
+      <h2>GET IN TOUCH</h2>
+      <p>Have a question about workouts? Want a custom plan? Or just want to say hi? Reach out on any of our platforms — we reply within 24 hours!</p>
+      <div class="clinks">
+        <a class="clink fb" id="fbCL" href="https://facebook.com/fithustle01" target="_blank"><div class="clico"><i class="fab fa-facebook-f"></i></div><div class="cltxt"><strong>Facebook</strong><span id="fbCS">facebook.com/fithustle01</span></div></a>
+        <a class="clink ig" id="igCL" href="https://instagram.com/fithustle01" target="_blank"><div class="clico"><i class="fab fa-instagram"></i></div><div class="cltxt"><strong>Instagram</strong><span id="igCS">instagram.com/fithustle01</span></div></a>
+        <a class="clink yt" id="ytCL" href="https://youtube.com/@FitHustle01" target="_blank"><div class="clico"><i class="fab fa-youtube"></i></div><div class="cltxt"><strong>YouTube</strong><span id="ytCS">youtube.com/@FitHustle01</span></div></a>
+        <a class="clink wa" id="waCL" href="https://wa.me/923213011948" target="_blank"><div class="clico"><i class="fab fa-whatsapp"></i></div><div class="cltxt"><strong>WhatsApp</strong><span>+92 3213011948</span></div></a>
+        <a class="clink em" href="mailto:fithustle01@gmail.com"><div class="clico"><i class="fas fa-envelope"></i></div><div class="cltxt"><strong>Email</strong><span>fithustle01@gmail.com</span></div></a>
+      </div>
+    </div>
+    <div class="ccard">
+      <h3>QUICK INFO</h3>
+      <div class="iit"><i class="fas fa-map-marker-alt"></i><span>Pakistan 🇵🇰</span></div>
+      <div class="iit"><i class="fas fa-clock"></i><span>Available: 9 AM – 11 PM (PKT)</span></div>
+      <div class="iit"><i class="fas fa-reply"></i><span>Reply time: Within 24 hours</span></div>
+      <div class="iit"><i class="fas fa-language"></i><span>Languages: Urdu & English</span></div>
+      <div class="iit"><i class="fas fa-phone"></i><span>+92 3213011948</span></div>
+      <div class="iit"><i class="fas fa-envelope"></i><span>fithustle01@gmail.com</span></div>
+      <br>
+      <a href="https://wa.me/923213011948" target="_blank" class="btn bg" style="justify-content:center;width:100%;"><i class="fab fa-whatsapp"></i> Message on WhatsApp</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="fgrid">
+    <div class="fbrand"><h2>FitHustle01</h2><p>Pakistan's #1 AI-powered fitness platform. Free workouts, plans, techniques and community — all in one place.</p></div>
+    <div class="fcol"><h3>Navigate</h3><a href="#about">About</a><a href="#videos">Videos</a><a href="#workouts">Workouts</a><a href="#download">Free Plan</a><a href="#contact">Contact</a></div>
+    <div class="fcol"><h3>Workouts</h3><a href="#workouts">Push-Ups</a><a href="#workouts">Pull-Ups</a><a href="#workouts">Squats</a><a href="#workouts">Leg Raises</a><a href="#workouts">Plank</a></div>
+    <div class="fcol"><h3>Social</h3><a id="fbF" href="https://facebook.com/fithustle01" target="_blank">Facebook</a><a id="igF" href="https://instagram.com/fithustle01" target="_blank">Instagram</a><a id="ytF" href="https://youtube.com/@FitHustle01" target="_blank">YouTube</a><a id="waF" href="https://wa.me/923213011948" target="_blank">WhatsApp</a></div>
+  </div>
+  <div class="copy">© 2026 FitHustle01 — All Rights Reserved | Built with ❤️ for fitness lovers</div>
+</footer>
+
+<script>
+// IMAGE UPLOADS
+function sImg(ii,imgId,k){
+  const inp=document.getElementById(ii),img=document.getElementById(imgId);
+  if(!inp||!img)return;
+  const sv=localStorage.getItem(k);if(sv)img.src=sv;
+  inp.addEventListener('change',function(e){
+    const f=e.target.files[0];if(!f||!f.type.startsWith('image/'))return;
+    const r=new FileReader();
+    r.onload=function(ev){img.src=ev.target.result;localStorage.setItem(k,ev.target.result);toast('✅ Image updated!');inp.value='';};
+    r.readAsDataURL(f);
+  });
+}
+sImg('logoInp','nLogo','fh_logo');sImg('heroInp','heroImg','fh_hero');sImg('aboutInp','aboutImg','fh_about');
+sImg('wi1','wi1Img','fh_wi1');sImg('wi2','wi2Img','fh_wi2');sImg('wi3','wi3Img','fh_wi3');
+sImg('wi4','wi4Img','fh_wi4');sImg('wi5','wi5Img','fh_wi5');sImg('wi6','wi6Img','fh_wi6');
+
+// SOCIAL
+const SM={
+  fb:{n:'fbL',f:'fbF',c:'fbCL',cs:'fbCS',k:'fh_fb'},
+  ig:{n:'igL',f:'igF',c:'igCL',cs:'igCS',k:'fh_ig'},
+  yt:{n:'ytL',f:'ytF',c:'ytCL',cs:'ytCS',k:'fh_yt'},
+  wa:{n:'waL',f:'waF',c:'waCL',k:'fh_wa'}
+};
+Object.keys(SM).forEach(k=>{
+  const sv=localStorage.getItem(SM[k].k);
+  if(sv){
+    ['n','f','c'].forEach(id=>{if(SM[k][id]&&document.getElementById(SM[k][id]))document.getElementById(SM[k][id]).href=sv;});
+    if(SM[k].cs&&document.getElementById(SM[k].cs))document.getElementById(SM[k].cs).textContent=sv.replace('https://','');
+  }
+});
+let curSoc='';
+function openMov(k,t){curSoc=k;document.getElementById('movTitle').textContent='Edit '+t+' Link';document.getElementById('movInp').value=document.getElementById(SM[k].n).href;document.getElementById('socMov').classList.add('act');document.getElementById('movInp').focus();}
+function closeMov(){document.getElementById('socMov').classList.remove('act');}
+function saveLink(){
+  const v=document.getElementById('movInp').value.trim();if(!v){alert('Link cannot be empty!');return;}
+  const m=SM[curSoc];
+  ['n','f','c'].forEach(id=>{if(m[id]&&document.getElementById(m[id]))document.getElementById(m[id]).href=v;});
+  if(m.cs&&document.getElementById(m.cs))document.getElementById(m.cs).textContent=v.replace('https://','');
+  localStorage.setItem(m.k,v);closeMov();toast('✅ Link saved!');
+}
+document.getElementById('movInp').addEventListener('keydown',e=>{if(e.key==='Enter')saveLink();if(e.key==='Escape')closeMov();});
+document.getElementById('socMov').addEventListener('click',function(e){if(e.target===this)closeMov();});
+
+// TABS
+function sw(pre,id,btn){
+  document.querySelectorAll('[id^="'+pre+'-"]').forEach(p=>p.classList.remove('act'));
+  const p=document.getElementById(pre+'-'+id);if(p)p.classList.add('act');
+  btn.parentElement.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('act'));
+  btn.classList.add('act');
+}
+
+// MOBILE MENU
+function openMM(){document.getElementById('mmenu').classList.add('open');}
+function closeMM(){document.getElementById('mmenu').classList.remove('open');}
+
+// BIRTH YEARS
+const ys=document.getElementById('dlYear');
+const cy=new Date().getFullYear();
+for(let y=cy-5;y>=1950;y--){const o=document.createElement('option');o.value=y;o.textContent=y;ys.appendChild(o);}
+
+// DOWNLOAD STEPS
+let chPlan='';
+function selPlan(card,name){
+  document.querySelectorAll('.pcard').forEach(c=>c.classList.remove('sel'));
+  card.classList.add('sel');chPlan=name;
+  setTimeout(()=>goStep(2),350);
+}
+function goStep(n){
+  document.querySelectorAll('.dlstep').forEach(s=>s.classList.remove('act'));
+  document.getElementById('ds'+n).classList.add('act');
+  for(let i=1;i<=3;i++){
+    const c=document.getElementById('ps'+i),l=document.getElementById('pl'+i);
+    c.classList.remove('done','act');if(l)l.classList.remove('done');
+    if(i<n){c.classList.add('done');if(l)l.classList.add('done');}
+    else if(i===n)c.classList.add('act');
+  }
+  if(n===2)document.getElementById('cpName').textContent=chPlan;
+}
+function subDl(){
+  const nm=document.getElementById('dlName').value.trim();
+  const yr=document.getElementById('dlYear').value;
+  const ct=document.getElementById('dlCountry').value;
+  if(!nm){alert('Please enter your name!');return;}
+  if(!yr){alert('Please select birth year!');return;}
+  if(!ct){alert('Please select your country!');return;}
+  const leads=JSON.parse(localStorage.getItem('fh_leads')||'[]');
+  leads.push({name:nm,year:yr,country:ct,plan:chPlan,time:new Date().toLocaleString()});
+  localStorage.setItem('fh_leads',JSON.stringify(leads));
+  document.getElementById('suTxt').textContent=nm+' from '+ct+' — your "'+chPlan+'" is ready! Click below to download now.';
+  goStep(3);
+}
+function doDownload(){
+  const plans={
+'Beginner Muscle Building Plan':`FITHUSTLE01 — BEGINNER MUSCLE BUILDING PLAN
+============================================
+4-Week Program | No Equipment Needed
+
+WEEK 1-2: FOUNDATION
+Monday:    Push-Ups 3x10 | Squats 3x15 | Plank 3x30sec
+Wednesday: Pull-Ups 2x5  | Lunges 3x12 | Leg Raises 3x10
+Friday:    Push-Ups 3x12 | Squats 3x20 | Mountain Climbers 3x15
+
+WEEK 3-4: PROGRESSION
+Monday:    Push-Ups 4x15 | Squats 4x20 | Plank 4x45sec
+Wednesday: Pull-Ups 3x8  | Lunges 4x15 | Leg Raises 4x15
+Friday:    Push-Ups 4x18 | Squats 4x25 | Burpees 3x10
+
+TIPS:
+- Rest 60 seconds between sets
+- Eat protein-rich food daily
+- Sleep 8 hours every night
+- YouTube: youtube.com/@FitHustle01
+- WhatsApp: +92 3213011948`,
+
+'Fat Loss & Cardio Plan':`FITHUSTLE01 — FAT LOSS & CARDIO PLAN
+======================================
+4-Week Program | Burn Maximum Fat
+
+WEEK 1-2: CARDIO BASE
+Monday:    Jumping Jacks 3x30 | Burpees 3x10 | Jog 20min
+Wednesday: Mountain Climbers 3x20 | High Knees 3x30 | Jump Rope 15min
+Friday:    HIIT: 30sec work, 15sec rest x 8 rounds
+
+WEEK 3-4: INTENSITY BOOST
+Monday:    Burpees 4x15 | Sprint 10x30sec | Squats 3x20
+Wednesday: Jump Squats 4x12 | Push-Ups 3x15 | Plank 3x60sec
+Friday:    Full HIIT 30 minutes non-stop
+
+DIET TIPS:
+- Drink 3 liters water daily
+- Eat 5 small meals per day
+- Avoid sugar and fried food
+- YouTube: youtube.com/@FitHustle01`,
+
+'Advanced Strength Plan':`FITHUSTLE01 — ADVANCED STRENGTH PLAN
+======================================
+4-Week Program | Heavy Lifting
+
+WEEK 1-2:
+Monday (Chest):    Bench Press 4x8 | Dips 3x12 | Push-Ups 3x20
+Tuesday (Back):    Pull-Ups 4x8 | Rows 4x10 | Curls 3x12
+Thursday (Legs):   Squats 4x8 | Deadlifts 3x6 | Lunges 3x12
+Friday (Shoulders):OHP 4x8 | Lateral Raise 3x15 | Face Pulls 3x15
+
+WEEK 3-4: Add 5% weight to all exercises
+
+RECOVERY:
+- Sleep 8-9 hours
+- 1g protein per pound bodyweight
+- YouTube: youtube.com/@FitHustle01`
+  };
+  const content=plans[chPlan]||plans['Beginner Muscle Building Plan'];
+  const blob=new Blob([content],{type:'text/plain'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='FitHustle01_'+chPlan.replace(/ /g,'_')+'.txt';
+  a.click();URL.revokeObjectURL(url);
+  toast('🎉 Plan downloaded!');
+}
+
+// TOAST
+function toast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ACTIVE NAV
+window.addEventListener('scroll',()=>{
+  let cur='';
+  document.querySelectorAll('section[id]').forEach(s=>{if(window.scrollY>=s.offsetTop-120)cur=s.id;});
+  document.querySelectorAll('.nmenu a').forEach(a=>{a.classList.remove('act');if(a.getAttribute('href')==='#'+cur)a.classList.add('act');});
+});
+</script>
+</body>
+</html>
